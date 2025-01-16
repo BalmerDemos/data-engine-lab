@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  data-engine-lab:
+    image: data-engine-lab:latest
+    container_name: data-engine-lab
+    build:
+      context: .
+    depends_on:
+      - mongodb
+    networks:
+      - eml-network
+    volumes:
+      - ./flows:/app/flows
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./scripts:/app/scripts
+    ports:
+      - "4200:4200" # Prefect UI port (optional)
+      - "8888:8888" # Jupyter Notebook (if needed)
+    environment:
+      - MONGO_URI=mongodb://mongodb-eml:27017/movies_data
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-eml
+    networks:
+      - eml-network
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+
+networks:
+  eml-network:
+    driver: bridge
